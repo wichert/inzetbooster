@@ -1,6 +1,5 @@
 import httpx
 from bs4 import BeautifulSoup, Tag
-import os
 
 
 CSRF_TOKEN_NAME = "authenticity_token"
@@ -63,20 +62,20 @@ class Inzetrooster:
 
     def export_shifts(self) -> None:
         assert self.is_logged_in, "You must be logged in to export shifts"
-        # r = self.client.get(
-        #     f"https://inzetrooster.nl/{self.organisation}/admin", follow_redirects=False
-        # )
-        # assert r.status_code == 200
-        # r = self.client.get(
-        #     f"https://inzetrooster.nl/{self.organisation}/admin/shifts/modify",
-        #     follow_redirects=False,
-        # )
-        # assert r.status_code == 200
-        # r = self.client.get(
-        #     f"https://inzetrooster.nl/{self.organisation}/admin/shifts/modify",
-        #     follow_redirects=False,
-        # )
-        # assert r.status_code == 200
+        r = self.client.get(
+            f"https://inzetrooster.nl/{self.organisation}/admin", follow_redirects=False
+        )
+        assert r.status_code == 200
+        r = self.client.get(
+            f"https://inzetrooster.nl/{self.organisation}/admin/shifts/modify",
+            follow_redirects=False,
+        )
+        assert r.status_code == 200
+        r = self.client.get(
+            f"https://inzetrooster.nl/{self.organisation}/admin/shifts/modify",
+            follow_redirects=False,
+        )
+        assert r.status_code == 200
         r = self.client.get(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export",
             follow_redirects=False,
@@ -101,19 +100,7 @@ class Inzetrooster:
         r = self.client.post(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export.csv",
             data=data,
-            headers={
-                "accept": "*/*",
-                "origin": "https://inzetrooster.nl",
-                "referer": f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export",
-                "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-            },
             follow_redirects=False,
             extensions={"trace": log},
         )
-        assert r.status_code == 200
-
-
-with httpx.Client(follow_redirects=True) as client:
-    ir = Inzetrooster(client, os.environ.get("ORGANIZATSION", "rvliethorp"))
-    ir.login(os.environ["USERNAME"], os.environ["PASSWORD"])
-    ir.export_shifts()
+        assert r.status_code == 200, "Export must return a 200 response"
