@@ -39,10 +39,16 @@ class Inzetrooster:
         assert (html is None) != (soup is None)
         if soup is None:
             soup = to_soup(html)
+
+        tag = soup.find("meta", {"name": "csrf-token"})
+        if isinstance(tag, Tag):
+            return tag.attrs["content"]
+
         tag = soup.find("input", {"type": "hidden", "name": CSRF_TOKEN_NAME})
-        if not isinstance(tag, Tag):
-            raise ValueError("no CSRF token found")
-        return tag.attrs["value"]
+        if isinstance(tag, Tag):
+            return tag.attrs["value"]
+
+        raise ValueError("no CSRF token found")
 
     def login(self, username: str, password: str) -> None:
         r = self.client.get(f"https://inzetrooster.nl/{self.organisation}/login")
@@ -62,20 +68,6 @@ class Inzetrooster:
 
     def export_shifts(self) -> None:
         assert self.is_logged_in, "You must be logged in to export shifts"
-        r = self.client.get(
-            f"https://inzetrooster.nl/{self.organisation}/admin", follow_redirects=False
-        )
-        assert r.status_code == 200
-        r = self.client.get(
-            f"https://inzetrooster.nl/{self.organisation}/admin/shifts/modify",
-            follow_redirects=False,
-        )
-        assert r.status_code == 200
-        r = self.client.get(
-            f"https://inzetrooster.nl/{self.organisation}/admin/shifts/modify",
-            follow_redirects=False,
-        )
-        assert r.status_code == 200
         r = self.client.get(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export",
             follow_redirects=False,
