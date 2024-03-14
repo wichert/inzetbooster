@@ -1,8 +1,6 @@
 import httpx
 from bs4 import BeautifulSoup, Tag
 
-from . import shifts
-
 CSRF_TOKEN_NAME = "authenticity_token"
 
 
