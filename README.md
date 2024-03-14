@@ -110,6 +110,13 @@ Successfully installed inzetbooster-1.0.0
 
 </details>
 
+You can now run the generated `inzetbooster` command:
+
+```shell
+$ .venv/bin/inzetbooster --org=myorg export-shifts
+"Dienst_id","Groep_id","Groep_naam","Datum","Dag","Starttijd","Eindtijd","Tijdsduur","Gebruiker_id","Naam","Email","Telefoon","Locatie_id","Locatie_naam","Afwezig","Geannuleerd","Starred","Opmerkingen"
+```
+
 ## Update requirements.txt
 
 `uv` is used to update the requirements file:
