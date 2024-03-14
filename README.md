@@ -2,6 +2,58 @@
 
 ## Installation
 
+### uv
+
+If you use [uv](https://github.com/astral-sh/uv) installation is done using the
+standard `venv` and `sync` commands:
+
+```text
+uv venv
+uv pip sync requirements.txt
+uv pip install -e .
+```
+
+<details>
+<summary>Details</summary>
+
+```shell
+$ uv venv
+Using Python 3.12.2 interpreter at: /opt/homebrew/opt/python@3.12/bin/python3.12
+Creating virtualenv at: .venv
+Activate with: source .venv/bin/activate
+
+$ uv pip sync requirements.txt
+Installed 12 packages in 7ms
+ + anyio==4.3.0
+ + beautifulsoup4==4.12.3
+ + certifi==2024.2.2
+ + h11==0.14.0
+ + html5lib==1.1
+ + httpcore==1.0.4
+ + httpx==0.27.0
+ + idna==3.6
+ + six==1.16.0
+ + sniffio==1.3.1
+ + soupsieve==2.5
+ + webencodings==0.5.1
+
+✦ ❯ uv pip install -e .
+   Built file:///home/wichert/hack/inzetbooster
+Built 1 editable in 364ms
+Resolved 13 packages in 1ms
+Installed 1 package in 0ms
+ + inzetbooster==1.0.0 (from file:///home/wichert/hack/inzetbooster)
+```
+
+</details>
+
+You can now run the generated `inzetbooster` command:
+
+```shell
+$ .venv/bin/inzetbooster --org=myorg export-shifts
+"Dienst_id","Groep_id","Groep_naam","Datum","Dag","Starttijd","Eindtijd","Tijdsduur","Gebruiker_id","Naam","Email","Telefoon","Locatie_id","Locatie_naam","Afwezig","Geannuleerd","Starred","Opmerkingen"
+```
+
 ### venv
 
 It is strongly recommended to use a [virtual environment](https://docs.python.org/3/library/venv.html) to install inzetbooster.
@@ -54,57 +106,6 @@ Building wheels for collected packages: inzetbooster
 Successfully built inzetbooster
 Installing collected packages: inzetbooster
 Successfully installed inzetbooster-1.0.0
-```
-
-</details>
-
-You can now run the generated `inzetbooster` command:
-
-```shell
-$ .venv/bin/inzetbooster
-```
-
-### uv
-
-If you use [uv](https://github.com/astral-sh/uv) installation is done using the
-standard `venv` and `sync` commands:
-
-```text
-uv venv
-uv pip sync requirements.txt
-uv pip install -e .
-```
-
-<details>
-<summary>Details</summary>
-
-```shell
-$ uv venv
-Using Python 3.12.2 interpreter at: /opt/homebrew/opt/python@3.12/bin/python3.12
-Creating virtualenv at: .venv
-Activate with: source .venv/bin/activate
-
-$ uv pip sync requirements.txt
-Installed 12 packages in 7ms
- + anyio==4.3.0
- + beautifulsoup4==4.12.3
- + certifi==2024.2.2
- + h11==0.14.0
- + html5lib==1.1
- + httpcore==1.0.4
- + httpx==0.27.0
- + idna==3.6
- + six==1.16.0
- + sniffio==1.3.1
- + soupsieve==2.5
- + webencodings==0.5.1
-
-✦ ❯ uv pip install -e .
-   Built file:///home/wichert/hack/inzetbooster
-Built 1 editable in 364ms
-Resolved 13 packages in 1ms
-Installed 1 package in 0ms
- + inzetbooster==1.0.0 (from file:///home/wichert/hack/inzetbooster)
 ```
 
 </details>

@@ -1,6 +1,7 @@
 import httpx
 from bs4 import BeautifulSoup, Tag
 
+from . import shifts
 
 CSRF_TOKEN_NAME = "authenticity_token"
 
@@ -52,7 +53,7 @@ class Inzetrooster:
         if not self.is_logged_in:
             raise ValueError("invalid credentials")
 
-    def export_shifts(self) -> None:
+    def export_shifts(self) -> str:
         assert self.is_logged_in, "You must be logged in to export shifts"
         r = self.client.get(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export",
@@ -81,3 +82,4 @@ class Inzetrooster:
         )
         assert r.status_code == 200, "Export must return a 200 response"
         assert r.headers["content-type"] == "text/csv", "Response must be CSV"
+        return r.text
