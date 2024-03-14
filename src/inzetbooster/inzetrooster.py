@@ -5,20 +5,6 @@ from bs4 import BeautifulSoup, Tag
 CSRF_TOKEN_NAME = "authenticity_token"
 
 
-def log(event_name, info):
-    if event_name == "http11.send_request_headers.started":
-        request = info["request"]
-        print(
-            event_name,
-            {
-                "url": request.method + b" " + request.url.target,
-                "headers": request.headers,
-            },
-        )
-    elif event_name in (""):
-        print(event_name, info)
-
-
 def to_soup(html: str) -> BeautifulSoup:
     return BeautifulSoup(html, "html5lib")
 
@@ -71,7 +57,6 @@ class Inzetrooster:
         r = self.client.get(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export",
             follow_redirects=False,
-            extensions={"trace": log},
         )
         assert r.status_code == 200
 
@@ -93,6 +78,6 @@ class Inzetrooster:
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export.csv",
             data=data,
             follow_redirects=False,
-            extensions={"trace": log},
         )
         assert r.status_code == 200, "Export must return a 200 response"
+        assert r.headers["content-type"] == "text/csv", "Response must be CSV"
