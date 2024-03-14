@@ -77,7 +77,6 @@ Collecting anyio==4.3.0 (from -r requirements.txt (line 3))
 .
 .
 .
-
 Installing collected packages: webencodings, soupsieve, sniffio, six, idna, h11, certifi, httpcore, html5lib, beautifulsoup4, anyio, httpx
 Successfully installed anyio-4.3.0 beautifulsoup4-4.12.3 certifi-2024.2.2 h11-0.14.0 html5lib-1.1 httpcore-1.0.4 httpx-0.27.0 idna-3.6 six-1.16.0 sniffio-1.3.1 soupsieve-2.5 webencodings-0.5.1
 
