@@ -18,26 +18,9 @@ class Inzetrooster:
         self.organisation = organisation
         self.is_logged_in = False
 
-    def _get_csrf(
-        self, *, html: str | None = None, soup: BeautifulSoup | None = None
-    ) -> str:
-        assert (html is None) != (soup is None)
-        if soup is None:
-            soup = to_soup(html)
-
-        tag = soup.find("meta", {"name": "csrf-token"})
-        if isinstance(tag, Tag):
-            return tag.attrs["content"]
-
-        tag = soup.find("input", {"type": "hidden", "name": CSRF_TOKEN_NAME})
-        if isinstance(tag, Tag):
-            return tag.attrs["value"]
-
-        raise ValueError("no CSRF token found")
-
     def login(self, username: str, password: str) -> None:
         r = self.client.get(f"https://inzetrooster.nl/{self.organisation}/login")
-        csrf_token = self._get_csrf(html=r.text)
+        csrf_token = get_csrf(html=r.text)
 
         r = self.client.post(
             f"https://inzetrooster.nl/{self.organisation}/login",
@@ -61,7 +44,7 @@ class Inzetrooster:
 
         export_soup = to_soup(r.text)
         data = {
-            CSRF_TOKEN_NAME: self._get_csrf(soup=export_soup),
+            CSRF_TOKEN_NAME: get_csrf(soup=export_soup),
             "from_date": "2024-01-01",
             "to_date": "2024-12-31",
             "days[]": [str(d + 1) for d in range(7)],
@@ -81,3 +64,19 @@ class Inzetrooster:
         assert r.status_code == 200, "Export must return a 200 response"
         assert r.headers["content-type"] == "text/csv", "Response must be CSV"
         return r.text
+
+
+def get_csrf(*, html: str | None = None, soup: BeautifulSoup | None = None) -> str:
+    assert (html is None) != (soup is None)
+    if soup is None:
+        soup = to_soup(html)
+
+    tag = soup.find("meta", {"name": "csrf-token"})
+    if isinstance(tag, Tag):
+        return tag.attrs["content"]
+
+    tag = soup.find("input", {"type": "hidden", "name": CSRF_TOKEN_NAME})
+    if isinstance(tag, Tag):
+        return tag.attrs["value"]
+
+    raise ValueError("no CSRF token found")
