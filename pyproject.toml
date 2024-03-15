@@ -15,7 +15,15 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
-dependencies = ["html5lib", "beautifulsoup4", "httpx", "click"]
+dependencies = [
+    "html5lib",
+    "beautifulsoup4",
+    "httpx",
+    "click",
+    "structlog",
+    "rich",
+    "colorama",
+]
 requires-python = ">= 3.10"
 
 [project.optional-dependencies]

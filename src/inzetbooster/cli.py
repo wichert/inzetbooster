@@ -1,5 +1,8 @@
 import click
 import httpx
+import structlog
+import sys
+from structlog.contextvars import bind_contextvars
 
 from .inzetrooster import Inzetrooster
 
@@ -13,6 +16,16 @@ from .inzetrooster import Inzetrooster
 @click.pass_context
 def main(ctx: click.Context, org: str, user: str, password: str):
     """Add-on utilities for inzetrooster"""
+    structlog.configure()
+    if not sys.stdout.isatty():
+        structlog.configure(
+            processors=structlog.get_config()["processors"][:-1]
+            + [
+                structlog.processors.dict_tracebacks,
+                structlog.processors.JSONRenderer(),
+            ]
+        )
+    bind_contextvars(org=org)
     ctx.obj = {
         "user": user,
         "password": password,

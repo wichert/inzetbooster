@@ -1,7 +1,10 @@
 import httpx
+import structlog
 from bs4 import BeautifulSoup, Tag
 
 CSRF_TOKEN_NAME = "authenticity_token"
+
+logger = structlog.get_logger(__name__)
 
 
 def to_soup(html: str) -> BeautifulSoup:
@@ -19,8 +22,10 @@ class Inzetrooster:
         self.is_logged_in = False
 
     def login(self, username: str, password: str) -> None:
+        logger.debug("Fetching login page")
         r = self.client.get(f"https://inzetrooster.nl/{self.organisation}/login")
         csrf_token = get_csrf(html=r.text)
+        logger.debug("got CSRF token for login page", token=csrf_token)
 
         r = self.client.post(
             f"https://inzetrooster.nl/{self.organisation}/login",
@@ -32,10 +37,13 @@ class Inzetrooster:
         )
         self.is_logged_in = "Geen geldige gebruikersnaam" not in r.text
         if not self.is_logged_in:
+            logger.error("login failed", username=username)
             raise ValueError("invalid credentials")
+        logger.info("login succeeded", username=username)
 
     def export_shifts(self) -> str:
         assert self.is_logged_in, "You must be logged in to export shifts"
+        logger.debug("loading export page to get CSRF and group ids")
         r = self.client.get(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export",
             follow_redirects=False,
@@ -56,6 +64,7 @@ class Inzetrooster:
             ],
             "button": "",
         }
+        logger.info("requesting CSV export", data=data)
         r = self.client.post(
             f"https://inzetrooster.nl/{self.organisation}/admin/shifts/export.csv",
             data=data,
