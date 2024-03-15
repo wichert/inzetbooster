@@ -6,3 +6,4 @@ __pycache__
 
 # Local test data files
 *.csv
+*.db
