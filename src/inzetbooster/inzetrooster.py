@@ -1,10 +1,10 @@
 import httpx
-import structlog
+import structlog.stdlib
 from bs4 import BeautifulSoup, Tag
 
 CSRF_TOKEN_NAME = "authenticity_token"
 
-logger = structlog.get_logger(__name__)
+logger = structlog.stdlib.get_logger(__name__)
 
 
 def to_soup(html: str) -> BeautifulSoup:
