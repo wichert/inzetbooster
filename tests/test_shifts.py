@@ -1,5 +1,4 @@
 import datetime
-import io
 from typing import Any
 
 import pytest
@@ -107,11 +106,11 @@ def test_is_covered(kw: dict[str, Any], covered: bool):
 
 
 def test_parse_csv():
-    input = io.StringIO("""\
+    input = """\
 "Dienst_id","Groep_id","Groep_naam","Datum","Dag","Starttijd","Eindtijd","Tijdsduur","Gebruiker_id","Naam","Email","Telefoon","Locatie_id","Locatie_naam","Afwezig","Geannuleerd","Starred","Opmerkingen"
 "2891448","12079","Bar met ervaring","13-01-2024"," Zaterdag","15:30","18:30","03:00","PRS2921","Alice Alice","alice@example.com","","","","","","","Nieuwjaarsborrel"
 "2926209","10736","Bar","13-01-2024"," Zaterdag","16:00","18:00","02:00","","","","","","","","","",""
-""")
+"""
     assert parse_csv(input) == [
         Shift(
             id=2891448,
