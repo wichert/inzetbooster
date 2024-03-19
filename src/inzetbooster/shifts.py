@@ -7,8 +7,11 @@ from typing import Iterable
 import jinja2
 import structlog.stdlib
 from structlog.contextvars import bound_contextvars
+from babel.dates import format_date
+from mjml import mjml2html
 
 from .auditlog import AuditLog
+from .mailer import Mailer
 
 logger = structlog.stdlib.get_logger(__name__)
 
@@ -52,20 +55,34 @@ def parse_csv(f: str) -> Iterable[Shift]:
     return [Shift.from_record(row) for row in reader]
 
 
-def send_shift_mails(auditlog: AuditLog, shifts: Iterable[Shift]):
+def send_shift_mails(auditlog: AuditLog, mailer: Mailer, shifts: Iterable[Shift]):
+    env = create_jinja_environment()
+
+    for shift in shifts:
+        _send_shift_mail(env, auditlog, mailer, shift)
+
+
+def create_jinja_environment(locale: str = "nl_NL") -> jinja2.Environment:
     env = jinja2.Environment(
         loader=jinja2.PackageLoader("inzetbooster"),
         autoescape=jinja2.select_autoescape(),
     )
-    for shift in shifts:
-        _send_shift_mail(env, auditlog, shift)
+
+    def filter_date_format(value: datetime.date):
+        return format_date(value, "EEEE d MMMM", locale=locale)
+
+    env.filters["format_date"] = filter_date_format
+    return env
 
 
-def _send_shift_mail(env: jinja2.Environment, auditlog: AuditLog, shift: Shift) -> None:
+def _send_shift_mail(
+    env: jinja2.Environment, auditlog: AuditLog, mailer: Mailer, shift: Shift
+) -> None:
     with bound_contextvars(
         shift_id=shift.id,
         group_id=shift.group_id,
         group_name=shift.group_name,
+        comments=shift.comments,
         user_email=shift.user_email,
         date=f"{shift.date.strftime("%Y-%m-%d")} {shift.start_time.strftime("%H:%M")}",
     ):
@@ -85,12 +102,21 @@ def _send_shift_mail(env: jinja2.Environment, auditlog: AuditLog, shift: Shift) 
                 "template was not found, can not send email", template=mail_template_id
             )
             return
-        _html = template.render(
+        subject = f"Aanmelding dienst {shift.group_name}"
+        mjml = template.render(
             {
-                "name": shift.user_email,
+                "subject": subject,
+                "name": shift.user_name,
                 "date": shift.date,
                 "start_time": shift.start_time,
                 "end_time": shift.end_time,
             }
         )
-        auditlog.log_mail(shift.id, mail_template_id, shift.user_email, "tralala")
+        html = mjml2html(mjml)
+        msg_id = mailer.send(
+            to_addr=shift.user_email,
+            to_name=shift.user_name,
+            subject=subject,
+            html=html,
+        )
+        auditlog.log_mail(shift.id, mail_template_id, shift.user_email, msg_id)

@@ -1,3 +1,5 @@
+import datetime
+
 import httpx
 import structlog.stdlib
 from bs4 import BeautifulSoup, Tag
@@ -51,10 +53,12 @@ class Inzetrooster:
         assert r.status_code == 200
 
         export_soup = to_soup(r.text)
+        from_date = datetime.date.today()
+        to_date = from_date + datetime.timedelta(weeks=52)
         data = {
             CSRF_TOKEN_NAME: get_csrf(soup=export_soup),
-            "from_date": "2024-01-01",
-            "to_date": "2024-12-31",
+            "from_date": from_date.strftime("%Y-%m-%d"),
+            "to_date": to_date.strftime("%Y-%m-%d"),
             "days[]": [str(d + 1) for d in range(7)],
             "group_ids[]": [
                 tag.attrs["value"]
