@@ -1,7 +1,8 @@
-from inzetbooster.shifts import Shift, parse_csv
-import pytest
 import datetime
-import io
+from typing import Any
+
+import pytest
+from inzetbooster.shifts import Shift, parse_csv
 
 
 @pytest.mark.parametrize(
@@ -30,7 +31,7 @@ import io
                 "Opmerkingen": "",
             },
             Shift(
-                shift_id=2926209,
+                id=2926209,
                 group_id=10736,
                 group_name="Bar",
                 date=datetime.date(2024, 1, 13),
@@ -65,7 +66,7 @@ import io
                 "Opmerkingen": "Nieuwjaarsborrel",
             },
             Shift(
-                shift_id=2891448,
+                id=2891448,
                 group_id=12079,
                 group_name="Bar met ervaring",
                 date=datetime.date(2024, 1, 13),
@@ -83,15 +84,36 @@ def test_from_record(record: dict[str, str], shift: Shift):
     assert Shift.from_record(record) == shift
 
 
+@pytest.mark.parametrize(
+    ["kw", "covered"],
+    [
+        ({"user_id": 1}, True),
+        ({"user_id": None}, False),
+    ],
+)
+def test_is_covered(kw: dict[str, Any], covered: bool):
+    args = {
+        "id": 1,
+        "group_id": 2,
+        "group_name": "Group",
+        "date": datetime.date(2024, 3, 18),
+        "start_time": datetime.time(21, 9),
+        "end_time": datetime.time(21, 13),
+        "comments": "Shovel snow ❄️",
+    }
+    args.update(**kw)
+    assert Shift(**args).is_covered == covered
+
+
 def test_parse_csv():
-    input = io.StringIO("""\
+    input = """\
 "Dienst_id","Groep_id","Groep_naam","Datum","Dag","Starttijd","Eindtijd","Tijdsduur","Gebruiker_id","Naam","Email","Telefoon","Locatie_id","Locatie_naam","Afwezig","Geannuleerd","Starred","Opmerkingen"
 "2891448","12079","Bar met ervaring","13-01-2024"," Zaterdag","15:30","18:30","03:00","PRS2921","Alice Alice","alice@example.com","","","","","","","Nieuwjaarsborrel"
 "2926209","10736","Bar","13-01-2024"," Zaterdag","16:00","18:00","02:00","","","","","","","","","",""
-""")
+"""
     assert parse_csv(input) == [
         Shift(
-            shift_id=2891448,
+            id=2891448,
             group_id=12079,
             group_name="Bar met ervaring",
             date=datetime.date(2024, 1, 13),
@@ -103,7 +125,7 @@ def test_parse_csv():
             comments="Nieuwjaarsborrel",
         ),
         Shift(
-            shift_id=2926209,
+            id=2926209,
             group_id=10736,
             group_name="Bar",
             date=datetime.date(2024, 1, 13),
