@@ -3,6 +3,8 @@ __pycache__
 .vscode
 .env
 .venv
+.coverage
+htmlcov
 
 # Local test data files
 *.csv
