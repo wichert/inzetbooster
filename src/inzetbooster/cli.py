@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import click
@@ -18,10 +19,21 @@ from .mailer import Mailer
 @click.option("--user", prompt=True, envvar="USERNAME", help="Username")
 @click.password_option(envvar="PASSWORD", confirmation_prompt=False)
 @click.option("--auditlog", envvar="AUDITLOG", default="audit.db")
+@click.option("-v", "--verbose", count=True)
 @click.pass_context
-def main(ctx: click.Context, org: str, user: str, password: str, auditlog: str):
+def main(
+    ctx: click.Context, org: str, user: str, password: str, auditlog: str, verbose: int
+):
     """Add-on utilities for inzetrooster"""
-    structlog.configure()
+    log_level = logging.WARNING
+    if verbose >= 2:
+        log_level = logging.DEBUG
+    elif verbose >= 1:
+        log_level = logging.INFO
+    structlog.configure(
+        wrapper_class=structlog.make_filtering_bound_logger(log_level),
+    )
+
     if not sys.stdout.isatty():
         structlog.configure(
             processors=structlog.get_config()["processors"][:-1]
