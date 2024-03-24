@@ -10,7 +10,6 @@ standard `venv` and `sync` commands:
 ```text
 uv venv
 uv pip sync requirements.txt
-uv pip install -e .
 ```
 
 <details>
@@ -36,12 +35,6 @@ Installed 12 packages in 7ms
  + sniffio==1.3.1
  + soupsieve==2.5
  + webencodings==0.5.1
-
-✦ ❯ uv pip install -e .
-   Built file:///home/wichert/hack/inzetbooster
-Built 1 editable in 364ms
-Resolved 13 packages in 1ms
-Installed 1 package in 0ms
  + inzetbooster==1.0.0 (from file:///home/wichert/hack/inzetbooster)
 ```
 
@@ -61,7 +54,6 @@ It is strongly recommended to use a [virtual environment](https://docs.python.or
 ```text
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/pip install -e .
 ```
 
 <details>
@@ -121,7 +113,7 @@ $ .venv/bin/inzetbooster --org=myorg export-shifts
 `uv` is used to update the requirements file:
 
 ```shell
-$ uv pip compile pyproject.toml -o requirements.txt --generate-hashes --all-extras > requirements.txt
+$ uv pip compile requirements.txt.in -o requirements.txt --generate-hashes -q
 warning: Requirements file requirements.txt does not contain any dependencies
 Resolved 12 packages in 427ms
 ```

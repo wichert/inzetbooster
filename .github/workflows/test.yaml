@@ -36,7 +36,6 @@ jobs:
           python -m pip install uv
           uv venv
           uv pip sync requirements.txt
-          uv pip install -e .[dev]
 
       - name: Activate virtualenv
         run: |
