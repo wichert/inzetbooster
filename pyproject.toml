@@ -26,6 +26,7 @@ dependencies = [
     "Jinja2",
     "Babel",
     "mjml-python",
+    "openpyxl",
 ]
 requires-python = ">= 3.10"
 
