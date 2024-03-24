@@ -93,7 +93,7 @@ def _send_shift_mail(
         if auditlog.was_mail_send(shift.id, mail_template_id, shift.user_email):
             logger.debug("email already send for this shift")
             return
-        logger.info("generating email for shift")
+        logger.debug("generating email for shift")
 
         try:
             template = env.get_template(mail_template_id)
@@ -119,4 +119,5 @@ def _send_shift_mail(
             subject=subject,
             html=html,
         )
+        logger.info("shift email successfully sent")
         auditlog.log_mail(shift.id, mail_template_id, shift.user_email, msg_id)
