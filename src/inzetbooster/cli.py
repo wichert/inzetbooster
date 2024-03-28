@@ -1,12 +1,13 @@
 import logging
 import sys
+from typing import BinaryIO
 
 import click
 import httpx
 import structlog
 from structlog.contextvars import bind_contextvars
 
-from . import shifts
+from . import shifts, users
 from .auditlog import AuditLog
 from .inzetrooster import Inzetrooster
 from .mailer import Mailer
@@ -120,6 +121,41 @@ def send_shift_mails(
             shifts.send_shift_mails(auditlog, mailer, all_shifts)
     finally:
         auditlog.close()
+
+
+@main.command()
+@click.argument("manegeplan_export", type=click.File("rb"))
+@click.pass_obj
+def sync_users_from_manegeplan(obj: dict[str, str], manegeplan_export: BinaryIO):
+    """Sync users with an export from manegeplan"""
+    logger = structlog.stdlib.get_logger(__name__)
+
+    logger.debug("reading manegeplan data", path=manegeplan_export.name)
+    people = []
+    for person in users.read_manegeplan_export(manegeplan_export):
+        if not person.is_valid():
+            logger.warn(
+                "skipping invalid person", email=person.email, user_id=person.id
+            )
+        else:
+            people.append(person)
+    logger.info("finished parsing manegeplan data", user_count=len(people))
+
+    with httpx.Client(follow_redirects=True) as client:
+        ir = Inzetrooster(client, obj["org"])
+        ir.login(obj["user"], obj["password"])
+        existing_people = list(users.parse_csv(ir.export_users()))
+        for person in existing_people:
+            if not person.is_manegeplan_user():
+                # Adding inzetrooster-native people to our list of people to
+                # import will reactive their account.
+                logger.info(
+                    "adding non-manegeplan user to import list", email=person.email
+                )
+                people.append(person)
+        # ir.make_all_users_inactive()
+        user_csv = users.create_csv(existing_people)
+        ir.import_users(user_csv)
 
 
 if __name__ == "__main__":

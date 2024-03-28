@@ -30,9 +30,9 @@ class Shift:
     user_email: str | None = None
 
     @classmethod
-    def from_record(self, record: dict[str, str]):
+    def from_record(cls, record: dict[str, str]):
         logger.debug("parsing CSV record", data=record)
-        return Shift(
+        return cls(
             id=int(record["Dienst_id"]),
             group_id=int(record["Groep_id"]),
             group_name=record["Groep_naam"],

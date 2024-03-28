@@ -78,6 +78,77 @@ class Inzetrooster:
         assert r.headers["content-type"] == "text/csv", "Response must be CSV"
         return r.text
 
+    def import_users(self, csv_data: str) -> None:
+        assert self.is_logged_in, "You must be logged in to manage inactive users"
+        r = self.client.get(
+            f"https://inzetrooster.nl/{self.organisation}/admin/person_imports/new"
+        )
+        data = {
+            CSRF_TOKEN_NAME: get_csrf(html=r.text),
+        }
+        files = {"person_import[file]": ("users.csv", csv_data, "text/csv")}
+        r = self.client.post(
+            f"https://inzetrooster.nl/{self.organisation}/admin/person_imports",
+            data=data,
+            files=files,
+            follow_redirects=False,
+        )
+        assert r.status_code == 302, "Export must return a 302 response"
+        assert (
+            r.headers["location"]
+            == f"https://inzetrooster.nl/{self.organisation}/admin"
+        )
+
+    def export_users(self, include_inactive: bool = False) -> str:
+        assert self.is_logged_in, "You must be logged in to manage inactive users"
+        r = self.client.get(
+            f"https://inzetrooster.nl/{self.organisation}/admin/people/export"
+        )
+        data = {
+            CSRF_TOKEN_NAME: get_csrf(html=r.text),
+            "group_ids[]": "0",
+            "field[]": [
+                "identity",
+                "first_name",
+                "infix",
+                "last_name",
+                "email",
+                "username",
+                "exempt",
+                "active_date",
+                "inactive_date",
+                "role",
+                "remarks",
+                "last_activity",
+            ],
+        }
+        if include_inactive:
+            data["inactive_people"] = "true"
+        r = self.client.post(
+            f"https://inzetrooster.nl/{self.organisation}/admin/people/export.csv",
+            data=data,
+            follow_redirects=False,
+        )
+        assert r.status_code == 200, "Export must return a 200 response"
+        assert r.headers["content-type"] == "text/csv", "Response must be CSV"
+        return r.text
+
+    def make_all_users_inactive(self) -> None:
+        assert self.is_logged_in, "You must be logged in to manage inactive users"
+        r = self.client.get(
+            f"https://inzetrooster.nl/{self.organisation}/admin/people/destroy/all"
+        )
+        data = {
+            CSRF_TOKEN_NAME: get_csrf(html=r.text),
+            "people_set_all": "inactive",
+        }
+        r = self.client.post(
+            f"https://inzetrooster.nl/{self.organisation}/admin/people/destroy/all",
+            data=data,
+            follow_redirects=False,
+        )
+        assert r.status_code == 200, "Export must return a 200 response"
+
 
 def get_csrf(*, html: str | None = None, soup: BeautifulSoup | None = None) -> str:
     assert (html is None) != (soup is None)
