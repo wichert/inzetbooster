@@ -84,7 +84,7 @@ def _send_shift_mail(
         group_name=shift.group_name,
         comments=shift.comments,
         user_email=shift.user_email,
-        date=f"{shift.date.strftime("%Y-%m-%d")} {shift.start_time.strftime("%H:%M")}",
+        date=f'{shift.date.strftime("%Y-%m-%d")} {shift.start_time.strftime("%H:%M")}',
     ):
         if not shift.is_covered:
             logger.debug("shift is not covered, skipping")
