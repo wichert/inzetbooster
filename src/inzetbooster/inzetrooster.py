@@ -147,7 +147,7 @@ class Inzetrooster:
             data=data,
             follow_redirects=False,
         )
-        assert r.status_code == 200, "Export must return a 200 response"
+        assert r.status_code == 302, "Export must return a 302 response"
 
 
 def get_csrf(*, html: str | None = None, soup: BeautifulSoup | None = None) -> str:

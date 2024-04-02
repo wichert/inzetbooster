@@ -153,8 +153,10 @@ def sync_users_from_manegeplan(obj: dict[str, str], manegeplan_export: BinaryIO)
                     "adding non-manegeplan user to import list", email=person.email
                 )
                 people.append(person)
-        # ir.make_all_users_inactive()
-        user_csv = users.create_csv(existing_people)
+        ir.make_all_users_inactive()
+        user_csv = users.create_csv(people)
+        with open("/tmp/users.csv", "wb") as output:
+            output.write(user_csv.encode("utf-8"))
         ir.import_users(user_csv)
 
 

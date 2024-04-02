@@ -64,7 +64,9 @@ def parse_csv(f: str) -> Iterable[Person]:
 def create_csv(people: Iterable[Person]) -> str:
     output = io.StringIO(newline="")
     writer = csv.writer(output, dialect=csv.unix_dialect)
-    writer.writerow(["Gebruiker_id", "Voornaam", "Tussen", "Achternaam", "Email"])
+    writer.writerow(
+        ["Gebruiker_id", "Voornaam", "Tussen", "Achternaam", "Email", "Inactief_datum"]
+    )
     for person in people:
         writer.writerow(
             [
@@ -73,6 +75,9 @@ def create_csv(people: Iterable[Person]) -> str:
                 person.preposition,
                 person.surname,
                 person.email,
+                person.deactived_date.strftime("%Y-%m-%d")
+                if person.deactived_date
+                else "",
             ]
         )
     return output.getvalue()
