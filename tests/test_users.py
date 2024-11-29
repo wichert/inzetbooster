@@ -77,7 +77,7 @@ def test_read_manegeplan_export():
 
 def test_parse_csv():
     input = """\
-"Persoon_ID","Roepnaam","Tussenvoegsels","Achternaam","E_Mail","Gebruikersnaam","Vrijgesteld","Actief_datum","Inactief_datum","Herinneringen","Rol_en_rechten","Opmerkingen","Laatste_login"
+"Gebruiker_id","Voornaam","Tussen","Achternaam","Email","Gebruikersnaam","Vrijgesteld","Actief_datum","Inactief_datum","Herinneringen","Rol_en_rechten","Opmerkingen","Laatste_login"
 "2","Vrijwilligerscoordinator","","Liethorp","vrijwilligers@example.com","vrijwilligers","false","12-01-2024","","true","admin","","2024-03-25 11:59"
 "PRS100","","","Acme Ltd","info@acme.example.com","acme","false","20-04-2023","","true","user","","2024-02-01 17:31"
 "PRS103","Bianca","","Smith","bianca@example.com","BiancaPRS103","false","20-04-2023","","true","user","",""
