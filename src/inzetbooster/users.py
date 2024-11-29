@@ -99,9 +99,10 @@ def read_manegeplan_export(fn: str | BinaryIO) -> Iterable[Person]:
         data = {column: cell.value for column, cell in zip(column_names, row_cells)}
 
         yield Person(
-            id=data["Gebruiker_id"],
-            firstname=data["Voornaam"] or "",
-            preposition=data["Tussen"] or "",
+            id=data["Persoon_ID"],
+            firstname=data["Roepnaam"] or "",
+            preposition=data["Tussenvoegsels"] or "",
             surname=data["Achternaam"] or "",
-            email=data["Email"] or "",
+            email=data["E_Mail"] or "",
+
         )
